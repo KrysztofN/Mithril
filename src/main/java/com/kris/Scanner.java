@@ -1,6 +1,7 @@
 package com.kris;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.kris.TokenType.*;
@@ -11,6 +12,32 @@ public class Scanner {
     private int start = 0;
     private int curr = 0;
     private int line = 1;
+
+    private static final HashMap<String, TokenType> keywords = new HashMap<>();
+
+    static {
+        keywords.put("rune", RUNE);
+        keywords.put("forge", FORGE);
+        keywords.put("quest", QUEST);
+        keywords.put("bear", BEAR);
+        keywords.put("speak", SPEAK);
+        keywords.put("should", SHOULD);
+        keywords.put("lest", LEST);
+        keywords.put("wander", WANDER);
+        keywords.put("whilst", WHILST);
+        keywords.put("in", IN);
+        keywords.put("fellowship", FELLOWSHIP);
+        keywords.put("mine", MINE);
+        keywords.put("light", LIGHT);
+        keywords.put("shadow", SHADOW);
+        keywords.put("naught", NAUGHT);
+        keywords.put("doom", DOOM);
+        keywords.put("ward", WARD);
+        keywords.put("and", AND);
+        keywords.put("or", OR);
+        keywords.put("wise", WISE);
+        keywords.put("wizard", WIZARD);
+    }
 
     Scanner(String source){
         this.source = source;
@@ -119,6 +146,13 @@ public class Scanner {
                     }
                     Double value = Double.parseDouble(source.substring(start, curr));
                     addToken(NUMBER, value);
+                } else if (isAlpha(c)) {
+                    while(isAlnum(peek())) advance();
+                    String text = source.substring(start, curr);
+                    System.out.println(text);
+                    TokenType type = keywords.get(text);
+                    if(type == null) type = IDENTIFIER;
+                    addToken(type);
                 } else {
                     Mithril.error(line, "Unexpected character.");
                 }
@@ -169,6 +203,16 @@ public class Scanner {
             return true;
         }
         return false;
+    }
+
+    private boolean isAlpha(char c){
+        return (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                c == '_';
+    }
+
+    private boolean isAlnum(char c){
+        return isAlpha(c) || Character.isDigit(c);
     }
 
 }
