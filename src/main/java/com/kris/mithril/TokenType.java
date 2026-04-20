@@ -1,4 +1,4 @@
-package com.kris;
+package com.kris.mithril;
 
 public enum TokenType {
     LEFT_PARENTHESIS, RIGHT_PARENTHESIS, LEFT_BRACE, RIGHT_BRACE,
@@ -9,9 +9,7 @@ public enum TokenType {
     IDENTIFIER, STRING, NUMBER,
 
     RUNE, FORGE, QUEST, BEAR, SPEAK, SHOULD, LEST, WANDER, WHILST, IN, FELLOWSHIP, MINE,
-    LIGHT, SHADOW, NAUGHT, DOOM, WARD, AND, OR, WISE,
-
-    WIZARD,
+    LIGHT, SHADOW, NAUGHT, DOOM, WARD, AND, OR, WISE, WIZARD,
 
     EOF
 }

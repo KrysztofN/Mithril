@@ -1,4 +1,4 @@
-package com.kris;
+package com.kris.mithril;
 
 import java.io.BufferedReader;
 import java.io.IOException;

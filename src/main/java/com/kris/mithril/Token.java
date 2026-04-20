@@ -1,4 +1,4 @@
-package com.kris;
+package com.kris.mithril;
 
 public class Token {
     final TokenType type;

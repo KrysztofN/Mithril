@@ -1,10 +1,10 @@
-package com.kris;
+package com.kris.mithril;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static com.kris.TokenType.*;
+import static com.kris.mithril.TokenType.*;
 
 public class Scanner {
     private final String source;
