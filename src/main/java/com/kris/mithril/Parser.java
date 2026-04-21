@@ -115,8 +115,8 @@ public class Parser {
     }
 
     private Expr primary() {
-        if (match(LIGHT)) return new Expr.Literal(false);
-        if (match(SHADOW)) return new Expr.Literal(true);
+        if (match(LIGHT)) return new Expr.Literal(true);
+        if (match(SHADOW)) return new Expr.Literal(false);
         if (match(NAUGHT)) return new Expr.Literal(null);
 
         if (match(NUMBER, STRING)) {
