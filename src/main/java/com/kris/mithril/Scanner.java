@@ -149,7 +149,6 @@ public class Scanner {
                 } else if (isAlpha(c)) {
                     while(isAlnum(peek())) advance();
                     String text = source.substring(start, curr);
-                    System.out.println(text);
                     TokenType type = keywords.get(text);
                     if(type == null) type = IDENTIFIER;
                     addToken(type);

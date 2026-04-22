@@ -10,6 +10,9 @@ import java.util.List;
 
 public class Mithril {
     static boolean hadError = false;
+    static boolean hadRuntimeError = false;
+
+    private static final Interpreter interpreter = new Interpreter();
 
     static void main(String[] args) throws IOException {
         if(args.length > 1){
@@ -27,6 +30,7 @@ public class Mithril {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         run(new String(bytes, Charset.defaultCharset()));
         if(hadError) System.exit(65);
+        if(hadRuntimeError) System.exit(70);
     }
 
     private static void runPrompt() throws IOException {
@@ -39,18 +43,27 @@ public class Mithril {
             if(line == null) break;
             run(line);
             hadError = false;
+            hadRuntimeError = false;
         }
     }
 
     private static void run(String source){
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
+
+//        for (Token token : tokens){
+//            System.out.print(token + " ");
+//        }
+
         Parser parser = new Parser(tokens);
         Expr expression = parser.parse();
+
         if (hadError) return;
-        System.out.println(new AstPrinter().print(expression));
 
+        boolean success = interpreter.interpret(expression);
+        if(!success) hadRuntimeError = true;
 
+//        System.out.println(new AstPrinter().print(expression));
     }
 
     static void error(int line, String message){
@@ -63,10 +76,10 @@ public class Mithril {
     }
 
     static void error(Token token, String message){
-        if(token.type == TokenType.EOF){
-            report(token.line, " at end", message);
+        if(token.type() == TokenType.EOF){
+            report(token.line(), " at end", message);
         } else {
-            report(token.line, " at '" + token.lexeme + "'", message);
+            report(token.line(), " at '" + token.lexeme() + "'", message);
         }
     }
 }
