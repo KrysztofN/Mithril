@@ -1,4 +1,4 @@
-package com.kris.mithril;
+package com.kris.mithrilAST;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,12 +56,10 @@ public class Mithril {
 //        }
 
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements  = parser.parseProgram();
 
         if (hadError) return;
-
-        boolean success = interpreter.interpret(expression);
-        if(!success) hadRuntimeError = true;
+        interpreter.interpret(statements);
 
 //        System.out.println(new AstPrinter().print(expression));
     }

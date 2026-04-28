@@ -1,18 +1,92 @@
 package com.kris.mithril;
 
+import java.util.List;
+
 public class Interpreter {
 
-    public boolean interpret(Expr expr){
-        MithrilResult<Object> result = evaluate(expr);
-        switch (result){
-            case MithrilResult.Ok<Object> ok -> {
-                System.out.println(stringify(ok.value()));
-                return true;
-            }
-            case MithrilResult.Err<Object> err -> {
+    private final Environment globalEnv  = new Environment();
+
+    private Environment currentEnv = globalEnv;
+
+    public void interpret(List<Stmt> statements){
+        for(Stmt stmt : statements){
+            MithrilResult<Object> result = execute(stmt);
+            if (result instanceof MithrilResult.Err<Object> err){
                 System.err.println("[line " + err.line() + "] Runtime error: " + err.message());
-                return false;
+                Mithril.hadRuntimeError = true;
+                return;
             }
+        }
+    }
+
+    private MithrilResult<Object> execute(Stmt stmt) {
+        return switch (stmt) {
+
+            case Stmt.Expression s -> {
+                MithrilResult<Object> result = evaluate(s.expression());
+                yield result.isErr() ? result : MithrilResult.ok(null);
+            }
+
+            case Stmt.Speak s -> {
+                MithrilResult<Object> result = evaluate(s.expression());
+                if (result.isErr()) yield result;
+                System.out.println(stringify(result.unwrap()));
+                yield MithrilResult.ok(null);
+            }
+
+            case Stmt.VarDeclaration s -> {
+                MithrilResult<Object> result = evaluate(s.initializer());
+                if (result.isErr()) yield result;
+                if (s.mutable()) currentEnv.defineForge(s.name().lexeme(), result.unwrap());
+                else currentEnv.defineRune(s.name().lexeme(), result.unwrap());
+                yield MithrilResult.ok(null);
+            }
+
+            case Stmt.Assign s -> {
+                MithrilResult<Object> result = evaluate(s.value());
+                if (result.isErr()) yield result;
+                yield currentEnv.assign(s.name(), result.unwrap());
+            }
+
+            case Stmt.Block s -> executeBlock(s, new Environment(currentEnv));
+
+            case Stmt.Should s -> {
+                MithrilResult<Object> condResult = evaluate(s.condition());
+                if (condResult.isErr()) yield condResult;
+
+                if (isTruthy(condResult.unwrap())) {
+                    yield executeBlock(s.thenBlock(), new Environment(currentEnv));
+                } else if (s.elseBlock() != null) {
+                    yield executeBlock(s.elseBlock(), new Environment(currentEnv));
+                }
+                yield MithrilResult.ok(null);
+            }
+
+            case Stmt.Whilst s -> {
+                while (true) {
+                    MithrilResult<Object> condResult = evaluate(s.condition());
+                    if (condResult.isErr()) yield condResult;
+                    if (!isTruthy(condResult.unwrap())) break;
+
+                    MithrilResult<Object> bodyResult = executeBlock(s.body(), new Environment(currentEnv));
+                    if (bodyResult.isErr()) yield bodyResult;
+                }
+                yield MithrilResult.ok(null);
+            }
+        };
+    }
+
+    private MithrilResult<Object> executeBlock(Stmt.Block block, Environment blockEnv) {
+        Environment previous = currentEnv;
+        try {
+            currentEnv = blockEnv;
+            for (Stmt stmt : block.statements()) {
+                MithrilResult<Object> result = execute(stmt);
+                if (result.isErr()) return result;
+            }
+            return MithrilResult.ok(null);
+        } finally {
+            currentEnv = previous;
         }
     }
 
@@ -20,6 +94,7 @@ public class Interpreter {
         return switch (expr){
             case Expr.Literal l -> MithrilResult.ok(l.value());
             case Expr.Grouping g -> evaluate(g.inner());
+            case Expr.Variable v -> currentEnv.get(v.name());
             case Expr.Unary u -> {
                 MithrilResult<Object> rightResult = evaluate(u.right());
                 if (rightResult.isErr()) yield rightResult;
