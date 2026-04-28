@@ -1,4 +1,6 @@
-package com.kris.mithrilAST;
+package com.kris.mithril;
+
+import com.kris.mithrilAST.Interpreter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,7 +12,7 @@ import java.util.List;
 
 public class Mithril {
     static boolean hadError = false;
-    static boolean hadRuntimeError = false;
+    public static boolean hadRuntimeError = false;
 
     private static final Interpreter interpreter = new Interpreter();
 
@@ -51,17 +53,29 @@ public class Mithril {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
+//        Printing every token
+//        int curr_line = 1;
 //        for (Token token : tokens){
-//            System.out.print(token + " ");
+//            if (token.line() > curr_line){
+//                curr_line = token.line();
+//                System.out.println();
+//            }
+//            System.out.print(token + " | ");
 //        }
+
+//        Printing Token list
+        System.out.print("[");
+        for (Token token : tokens){
+            System.out.print(token.type() + ",");
+        }
+        System.out.print("]");
+
 
         Parser parser = new Parser(tokens);
         List<Stmt> statements  = parser.parseProgram();
 
         if (hadError) return;
         interpreter.interpret(statements);
-
-//        System.out.println(new AstPrinter().print(expression));
     }
 
     static void error(int line, String message){

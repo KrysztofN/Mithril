@@ -1,4 +1,9 @@
-package com.kris.mithril;
+package com.kris.mithrilAST;
+
+import com.kris.mithril.Expr;
+import com.kris.mithril.Mithril;
+import com.kris.mithril.MithrilResult;
+import com.kris.mithril.Stmt;
 
 import java.util.List;
 

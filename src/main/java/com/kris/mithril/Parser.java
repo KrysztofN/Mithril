@@ -1,9 +1,9 @@
-package com.kris.mithrilAST;
+package com.kris.mithril;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.kris.mithrilAST.TokenType.*;
+import static com.kris.mithril.TokenType.*;
 
 public class Parser {
     private static class ParseError extends RuntimeException {}

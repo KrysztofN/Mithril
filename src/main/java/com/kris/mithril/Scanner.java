@@ -146,6 +146,7 @@ public class Scanner {
                     }
                     Double value = Double.parseDouble(source.substring(start, curr));
                     addToken(NUMBER, value);
+
                 } else if (isAlpha(c)) {
                     while(isAlnum(peek())) advance();
                     String text = source.substring(start, curr);

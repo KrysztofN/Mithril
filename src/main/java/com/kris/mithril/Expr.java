@@ -1,4 +1,4 @@
-package com.kris.mithrilAST;
+package com.kris.mithril;
 
 public sealed interface Expr permits Expr.Binary, Expr.Unary, Expr.Grouping, Expr.Literal, Expr.Variable {
 
