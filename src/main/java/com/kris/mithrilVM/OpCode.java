@@ -1,0 +1,15 @@
+package com.kris.mithrilVM;
+
+public enum OpCode {
+    CONSTANT,
+    TRUE, FALSE, NAUGHT,
+    ADD, SUBTRACT, MULTIPLY, DIVIDE,
+    NEGATE, NOT,
+    EQUAL, NOT_EQUAL,
+    GREATER, GREATER_EQUAL,
+    LESS, LESS_EQUAL,
+    SPEAK, POP,
+    DEFINE_VAR, GET_VAR, SET_VAR,
+    JUMP, JUMP_IF_FALSE, LOOP,
+    RETURN
+}
