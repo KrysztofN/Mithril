@@ -1,6 +1,10 @@
 package com.kris.mithril;
 
 import com.kris.mithrilAST.Interpreter;
+import com.kris.mithrilVM.Chunk;
+import com.kris.mithrilVM.Compiler;
+import com.kris.mithrilVM.OpCode;
+import com.kris.mithrilVM.VM;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,6 +13,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Mithril {
     static boolean hadError = false;
@@ -50,6 +56,7 @@ public class Mithril {
     }
 
     private static void run(String source){
+        System.out.print("SOURCE CODE: " + source);
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
@@ -64,18 +71,24 @@ public class Mithril {
 //        }
 
 //        Printing Token list
-        System.out.print("[");
-        for (Token token : tokens){
-            System.out.print(token.type() + ",");
-        }
-        System.out.print("]");
-
+        List<TokenType> tokenTypeList = tokens.stream().map(Token::type).toList();
+        System.out.println("SCANNER OUTPUT: " + tokenTypeList);
 
         Parser parser = new Parser(tokens);
-        List<Stmt> statements  = parser.parseProgram();
+        List<Stmt> statements = parser.parseProgram();
 
         if (hadError) return;
-        interpreter.interpret(statements);
+
+//      [AST]
+//        interpreter.interpret(statements);
+
+
+//      [VM]
+        Chunk chunk = new Compiler().compile(statements);
+        System.out.println("Constants: " + chunk.constants);
+        System.out.println("Code: " + chunk.disassembleList);
+        System.out.println("Variable count: " + chunk.variableCount);
+        new VM(chunk).run();
     }
 
     static void error(int line, String message){
